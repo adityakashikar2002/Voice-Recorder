@@ -1,0 +1,236 @@
+/* RecordApp.css */
+/* .record-app {
+    background-color: #282c34; 
+    color: white;
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    padding: 20px;
+  } */
+
+  .record-app {
+    position: relative;
+    color: white;
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh; /* Allow content to expand */
+    padding: 20px;
+    overflow: auto; /* Enable scrolling */
+  }
+  
+  .background-video {
+    position: fixed; /* Keep the video static */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Covers the whole area without distortion */
+    z-index: -1; /* Send the video behind all content */
+    pointer-events: none; /* Allows clicks to pass through */
+  }
+  
+  
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  
+  .profile-button,
+  .menu-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+  }
+  
+  .search-bar {
+    background-color: #383e4a;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    color: white;
+    width: 60%;
+  }
+  
+  .language-selector {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+  
+  .language-item {
+    display: flex;
+    align-items: center;
+  }
+  
+  .flag {
+    width: 30px;
+    margin-right: 10px;
+  }
+  
+  .record-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+  
+  .record-circle {
+    width: 150px;
+    height: 150px;
+    border: 2px dashed #5a6270;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .record-button {
+    width: 100px;
+    height: 100px;
+    background-color: #e57373;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .microphone {
+    width: 40px;
+    height: 60px;
+    background-color: white;
+    border-radius: 20px 20px 5px 5px;
+    position: relative;
+  }
+  
+  .microphone::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 10px;
+    background-color: #e57373;
+    border-radius: 50%;
+  }
+  
+  .microphone::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid white;
+  }
+  
+  .microphone.recording {
+    animation: pulse 1s infinite ease-in-out;
+  }
+  
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  
+  .record-text {
+    background: none;
+    border: none;
+    color: white;
+    margin-top: 10px;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  
+  .waveform {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  
+  .waveform-placeholder {
+    display: flex;
+    justify-content: space-around;
+    height: 60px;
+    align-items: center;
+  }
+  
+  .waveform-line {
+    width: 5px;
+    height: 40px;
+    background-color: #e57373;
+    border-radius: 2px;
+  }
+  
+  .timeline {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  
+  .timeline-slider {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 5px;
+    background: #5a6270;
+    border-radius: 5px;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: 0.2s;
+    transition: opacity 0.2s;
+  }
+  
+  .timeline-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    background: #e57373;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  .time-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    margin-top: 5px;
+  }
+  
+  .controls {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .control-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    margin: 0 15px;
+    cursor: pointer;
+  }
+  
+  .play-button {
+    font-size: 30px;
+  }
+
+  
