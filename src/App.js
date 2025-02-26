@@ -2,9 +2,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './RecordApp.css';
 import MicRecorder from 'mic-recorder-to-mp3';
-import useRecordingStorage from './components/RecordingStorage';
+import RecordingStorage from './components/RecordingStorage';
 import PlaybackList from './components/PlaybackList';
-import WaveSurfer from 'wavesurfer.js';
+
 
 const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 
@@ -16,39 +16,41 @@ function RecordApp() {
   const [recordings, setRecordings] = useState([]);
   const [currentlyPlayingId, setCurrentlyPlayingId] = useState(null);
   const [statusMessage, setStatusMessage] = useState('');
-  const { saveRecording, deleteRecording } = useRecordingStorage(setRecordings);
-  const audioRef = useRef(null);
-  const waveformRef = useRef(null);
-  let timerInterval;
+  const [darkMode, setDarkMode] = useState(false);
 
-  useEffect(() => {
-    waveformRef.current = WaveSurfer.create({
-      container: '#waveform',
-      waveColor: '#ddd',
-      progressColor: '#4A90E2',
-      cursorColor: '#4A90E2',
-      height: 80,
-      responsive: true,
-    });
-  }, []);
+  const [recordingName, setRecordingName] = useState('');
+  const [showNameInput, setShowNameInput] = useState(false);
+
+  const { saveRecording, deleteRecording } = RecordingStorage(setRecordings);
+
+  const audioRef = useRef(null);
+  const timerRef = useRef(null);
+
+  const toggleDarkMode = () => {
+    setDarkMode((prevMode) => !prevMode);
+  };
 
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
+    const updateTime = () => setCurrentTime(audio.currentTime);
     const handlePlay = () => setIsPlaying(true);
     const handlePause = () => setIsPlaying(false);
     const handleEnded = () => {
       setIsPlaying(false);
       setCurrentTime(0);
       setStatusMessage('');
+      setCurrentlyPlayingId(null);
     };
 
+    audio.addEventListener('timeupdate', updateTime);
     audio.addEventListener('play', handlePlay);
     audio.addEventListener('pause', handlePause);
     audio.addEventListener('ended', handleEnded);
 
     return () => {
+      audio.removeEventListener('timeupdate', updateTime);
       audio.removeEventListener('play', handlePlay);
       audio.removeEventListener('pause', handlePause);
       audio.removeEventListener('ended', handleEnded);
@@ -56,11 +58,7 @@ function RecordApp() {
   }, []);
 
   const handleRecord = () => {
-    if (!isRecording) {
-      startRecording();
-    } else {
-      stopRecording();
-    }
+    isRecording ? stopRecording() : startRecording();
   };
 
   const startRecording = () => {
@@ -69,31 +67,47 @@ function RecordApp() {
         setIsRecording(true);
         setRecordingTime(0);
         setStatusMessage('New Recording');
-        timerInterval = setInterval(() => {
-          setRecordingTime((prevTime) => prevTime + 1);
+
+        timerRef.current = setInterval(() => {
+          setRecordingTime((prev) => prev + 1);
         }, 1000);
       })
-      .catch((e) => console.error(e));
-  };
-
-  const stopRecording = () => {
-    clearInterval(timerInterval);
-    Mp3Recorder.stop()
-      .getMp3()
-      .then(([buffer, blob]) => {
-        saveRecording(blob);
-        setIsRecording(false);
-        setRecordingTime(0);
-      })
-      .catch((e) => console.error('Error in stopping the recorder', e));
+      .catch(console.error);
   };
 
   
+  const stopRecording = () => {
+    clearInterval(timerRef.current);
+    Mp3Recorder.stop()
+        .getMp3()
+        .then(([buffer, blob]) => {
+            setShowNameInput(true); // Show name input prompt
+            setRecordingBlob(blob); // Store blob temporarily
+            setIsRecording(false);
+            setRecordingTime(0);
+        })
+        .catch(console.error);
+  };
+
+  const handleSaveRecording = () => {
+    saveRecording(recordingBlob, recordingName);
+    setShowNameInput(false);
+    setRecordingName(''); // Reset name input
+    setRecordingBlob(null); // Reset blob
+  };
+
+  const handleCancelRecording = () => {
+    setShowNameInput(false);
+    setRecordingName('');
+    setRecordingBlob(null);
+  }
+
+  const [recordingBlob, setRecordingBlob] = useState(null);
+
   const handlePlayPause = () => {
     if (audioRef.current) {
       if (audioRef.current.paused) {
         audioRef.current.play();
-        waveformRef.current.load(audioRef.current);
       } else {
         audioRef.current.pause();
       }
@@ -102,8 +116,7 @@ function RecordApp() {
 
   const handleSkip = (seconds) => {
     if (audioRef.current) {
-      let newTime = audioRef.current.currentTime + seconds;
-      newTime = Math.min(Math.max(newTime, 0), audioRef.current.duration);
+      let newTime = Math.max(0, Math.min(audioRef.current.currentTime + seconds, audioRef.current.duration));
       audioRef.current.currentTime = newTime;
       setCurrentTime(newTime);
     }
@@ -113,11 +126,9 @@ function RecordApp() {
     const url = URL.createObjectURL(blob);
     audioRef.current.src = url;
     audioRef.current.play();
-    waveformRef.current.load(audioRef.current);
     setCurrentlyPlayingId(id);
   };
 
- 
   const handleSeek = (e) => {
     const newTime = parseInt(e.target.value);
     setCurrentTime(newTime);
@@ -126,26 +137,28 @@ function RecordApp() {
     }
   };
 
-  const formatTime = (timeInSeconds) => {
-    const hrs = Math.floor(timeInSeconds / 3600);
-    const mins = Math.floor((timeInSeconds % 3600) / 60);
-    const secs = Math.floor(timeInSeconds % 60);
-    return `${hrs.toString().padStart(2, '0')}:${mins
-      .toString()
-      .padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  const formatTime = (time) => {
+    const hrs = Math.floor(time / 3600);
+    const mins = Math.floor((time % 3600) / 60);
+    const secs = Math.floor(time % 60);
+    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   return (
-    <div className="record-app">
-      <video className="background-video" autoPlay loop muted>
-        <source src="/video.mp4" type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
+    <div className={`record-app ${darkMode ? "dark-mode" : ""}`}>
 
       <div className="header">
-        <button className="profile-button">👤</button>
+        {/* <button className="menu-button">☰</button> */}
+        <button onClick={toggleDarkMode}>
+          {darkMode ? <img src="/lightm.png" alt="Light Mode" className="w-8 h-8 rounded-full"/> : <img src="/sleep-mode.png" alt="Dark Mode" className="w-8 h-8 rounded-full" />}
+        </button>
+        
         <input type="text" placeholder="Search" className="search-bar" />
-        <button className="menu-button">☰</button>
+
+        <button className="profile-button">
+        {darkMode ? <img src="/account.png" alt="User Profile" className="w-8 h-8 rounded-full" /> : <img src="/user1.png" alt="User Profile" className="w-8 h-8 rounded-full" />}
+        </button>
+        
       </div>
 
       <div className="record-section">
@@ -154,28 +167,43 @@ function RecordApp() {
             <div className={`microphone ${isRecording ? 'recording' : ''}`}></div>
           </div>
         </div>
-        <button className="record-text">{isRecording ? 'STOP' : 'RECORD'}</button>
-        {isRecording && (
-          <div className="recording-time">{formatTime(recordingTime)}</div>
-        )}
+        <button className={`record-text ${darkMode ? "dark-mode" : ""}`}>{isRecording ? 'STOP' : 'RECORD'}</button>
+        {isRecording && <div className={`recording-time ${darkMode ? "dark-mode" : ""}`}>{formatTime(recordingTime)}</div>}
       </div>
 
       {statusMessage && <div className="status-message">{statusMessage}</div>}
 
-      <div id="waveform" className="waveform-container"></div>
+      {showNameInput && (
+                <div className="name-input-modal">
+                    <div className="name-input-content">
+                        <input
+                            type="text"
+                            placeholder="Enter recording name"
+                            value={recordingName}
+                            onChange={(e) => setRecordingName(e.target.value)}
+                            className="name-input-field"
+                        />
+                        <div className="name-input-buttons">
+                            <button onClick={handleSaveRecording}>Save</button>
+                            <button onClick={handleCancelRecording}>Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            )
+      }
 
       <div className="timeline">
         <input
           type="range"
           min="0"
-          max={audioRef.current && !isNaN(audioRef.current.duration) ? Math.floor(audioRef.current.duration) : 0}
+          max={audioRef.current?.duration || 0}
           value={currentTime}
           onChange={handleSeek}
           className="timeline-slider"
         />
         <div className="time-labels">
           <span>{formatTime(currentTime)}</span>
-          <span>{audioRef.current && !isNaN(audioRef.current.duration) ? formatTime(audioRef.current.duration) : '00:00:00'}</span>
+          <span>{formatTime(audioRef.current?.duration || 0)}</span>
         </div>
       </div>
 
@@ -187,18 +215,14 @@ function RecordApp() {
         <button className="control-button" onClick={() => handleSkip(5)}>⏭</button>
       </div>
 
-      <audio
-        ref={audioRef}
-        onTimeUpdate={() => setCurrentTime(audioRef.current ? audioRef.current.currentTime : 0)}
-        onEnded={() => setCurrentlyPlayingId(null)}
-        onLoadedMetadata={() => setCurrentTime(0)}
-      />
+      <audio ref={audioRef} />
 
       <PlaybackList
         recordings={recordings}
         deleteRecording={deleteRecording}
         handlePlayFromList={handlePlayFromList}
         currentlyPlayingId={currentlyPlayingId}
+        darkMode={darkMode}
       />
     </div>
   );

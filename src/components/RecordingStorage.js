@@ -1,4 +1,5 @@
-// RecordingStorage.js
+//RecordingStorage.js
+
 import { useEffect, useRef, useCallback } from 'react';
 
 const RecordingStorage = (setRecordings) => {
@@ -32,23 +33,27 @@ const RecordingStorage = (setRecordings) => {
 
     request.onupgradeneeded = (event) => {
       dbRef.current = event.target.result;
-      dbRef.current.createObjectStore('recordings', {
+      const store = dbRef.current.createObjectStore('recordings', {
         keyPath: 'id',
         autoIncrement: true,
       });
+
+      // Ensure filenames are stored
+      store.createIndex('filename', 'filename', { unique: false });
     };
   }, [loadRecordings]);
 
-  const saveRecording = (blob) => {
+  
+  const saveRecording = (blob, filename) => {
     const transaction = dbRef.current.transaction(['recordings'], 'readwrite');
     const store = transaction.objectStore('recordings');
-    const request = store.add({ blob });
+    const request = store.add({ blob, filename: filename || null }); // Save filename
 
     request.onsuccess = () => {
-      loadRecordings();
+        loadRecordings();
     };
     request.onerror = (event) => {
-      console.error('Error saving recording: ', event.target.error);
+        console.error('Error saving recording:', event.target.error);
     };
   };
 
@@ -61,7 +66,7 @@ const RecordingStorage = (setRecordings) => {
       loadRecordings();
     };
     request.onerror = (event) => {
-      console.error('Error deleting recording: ', event.target.error);
+      console.error('Error deleting recording:', event.target.error);
     };
   };
 
@@ -69,3 +74,4 @@ const RecordingStorage = (setRecordings) => {
 };
 
 export default RecordingStorage;
+

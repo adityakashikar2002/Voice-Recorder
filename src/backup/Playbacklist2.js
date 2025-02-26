@@ -1,10 +1,27 @@
-// PlaybackList.js // Works for MP3 Download
-// import React from 'react';
+// //PlaybackList.js
+// import React, { useState } from "react";
 
-// const PlaybackList = ({ recordings, deleteRecording }) => {
+// const PlaybackList = ({
+//   recordings,
+//   deleteRecording,
+//   handlePlayFromList,
+//   currentlyPlayingId,
+//   darkMode,
+//   saveRecording
+// }) => {
+//   const [searchQuery, setSearchQuery] = useState("");
+
+//   // Filter recordings based on search query
+//   const filteredRecordings = recordings.filter((rec) =>
+//     (rec.filename || `Recording ${rec.id}`)
+//       .toLowerCase()
+//       .includes(searchQuery.toLowerCase())
+//   );
+
+//   // Function to download recording with its name
 //   const downloadRecording = (blob, filename) => {
 //     const url = URL.createObjectURL(blob);
-//     const a = document.createElement('a');
+//     const a = document.createElement("a");
 //     a.href = url;
 //     a.download = filename;
 //     document.body.appendChild(a);
@@ -14,30 +31,80 @@
 //   };
 
 //   return (
-//     <div className="p-6 bg-white shadow-xl rounded-2xl mt-6">
-//       <h2 className="text-2xl font-extrabold text-indigo-600 mb-4">🎙️ Saved Recordings</h2>
-//       {recordings.length === 0 ? (
-//         <p className="text-gray-500 italic">No recordings yet. Start recording to see them here!</p>
+//     <div className="p-6 shadow-2xl rounded-2xl mt-6">
+//       {/* Search Bar */}
+//       <div className="flex justify-center items-center h-16 w-full">
+//         <input 
+//           type="text"
+//           placeholder="Search Recording..."
+//           className="search-bar px-4 py-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 w-1/2 mb-4"
+//           value={searchQuery}
+//           onChange={(e) => setSearchQuery(e.target.value)}
+//         />
+//       </div>
+
+//       {/* Title with GIF */}
+//       <h2
+//         className={`text-3xl font-extrabold bg-gradient-to-r ${
+//           darkMode
+//             ? "from-white via-green-300 to-teal-400"
+//             : "from-gray-800 via-green-300 to-teal-400"
+//         } text-transparent bg-clip-text drop-shadow-lg mb-6 flex items-start space-x-3 rounded-xl p-4`}
+//       >
+//         <img
+//           src="/record.gif"
+//           alt="Microphone GIF"
+//           className="w-12 h-12 rounded-xl shadow-md"
+//         />
+//         <span className="tracking-wide">RECORDS</span>
+//       </h2>
+
+//       {filteredRecordings.length === 0 ? (
+//         <p className="text-gray-300 italic text-center">
+//           No matching recordings found.
+//         </p>
 //       ) : (
-//         <div className="space-y-4">
-//           {recordings.map((rec, index) => (
+//         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+//           {[...filteredRecordings].reverse().map((rec) => (
 //             <div
 //               key={rec.id}
-//               className="flex items-center space-x-4 p-4 bg-gray-100 rounded-lg shadow-sm hover:shadow-lg transition-shadow"
+//               className="flex flex-col items-center space-y-4 p-5 bg-gradient-to-r from-purple-500 via-pink-500 to-red-400 rounded-2xl shadow-xl hover:scale-105 transition-transform duration-300"
 //             >
-//               <audio controls src={URL.createObjectURL(rec.blob)} className="rounded-lg" />
+//               {/* Show filename if available, else default name */}
+//               <div className="text-white font-bold text-lg">
+//                 {rec.filename ? rec.filename : `Recording ${rec.id}`}
+//               </div>
+
+//               {/* Buttons: Play, Download, Delete */}
 //               <div className="flex space-x-2">
 //                 <button
-//                   onClick={() => downloadRecording(rec.blob, `recording-${index + 1}.mp3`)}
-//                   className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-full transition-colors"
+//                   onClick={() => handlePlayFromList(rec.blob, rec.id)}
+//                   className={`${
+//                     currentlyPlayingId === rec.id
+//                       ? "bg-orange-500 hover:bg-orange-600"
+//                       : "bg-green-500 hover:bg-green-600"
+//                   } text-white px-4 py-2 rounded-full transition-colors`}
 //                 >
-//                   ⬇️ Download
+//                   ▶ Play
 //                 </button>
+
+//                 <button
+//                   onClick={() =>
+//                     downloadRecording(
+//                       rec.blob,
+//                       rec.filename || `recording-${rec.id}.mp3`
+//                     )
+//                   }
+//                   className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition-colors"
+//                 >
+//                   Download
+//                 </button>
+
 //                 <button
 //                   onClick={() => deleteRecording(rec.id)}
-//                   className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-full transition-colors"
+//                   className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full transition-colors"
 //                 >
-//                   ❌ Delete
+//                   Delete
 //                 </button>
 //               </div>
 //             </div>
@@ -50,148 +117,112 @@
 
 // export default PlaybackList;
 
-// import React from 'react';
+//PlaybackList.js
+import React, { useState } from "react";
 
-// const PlaybackList = ({ recordings, deleteRecording, onSelect }) => {
-//   const downloadRecording = (blob, filename) => {
-//     const url = URL.createObjectURL(blob);
-//     const a = document.createElement('a');
-//     a.href = url;
-//     a.download = filename;
-//     document.body.appendChild(a);
-//     a.click();
-//     document.body.removeChild(a);
-//     URL.revokeObjectURL(url);
-//   };
+const PlaybackList = ({
+  recordings,
+  deleteRecording,
+  handlePlayFromList,
+  currentlyPlayingId,
+  darkMode,
+}) => {
+  const [searchQuery, setSearchQuery] = useState("");
 
-//   return (
-//     <div className="p-6 bg-white shadow-xl rounded-2xl mt-6">
-//       <h2 className="text-2xl font-extrabold text-indigo-600 mb-4">🎙️ Saved Recordings</h2>
-//       {recordings.length === 0 ? (
-//         <p className="text-gray-500 italic">No recordings yet. Start recording to see them here!</p>
-//       ) : (
-//         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-//           {recordings.map((rec, index) => (
-//             <div
-//               key={rec.id}
-//               className="recording-item p-4 bg-gray-100 rounded-lg shadow-sm hover:shadow-lg transition-shadow cursor-pointer"
-//               onClick={() => onSelect(rec)}
-//             >
-//               <div className="recording-name text-lg font-semibold mb-2">Recording {index + 1}</div>
-//               <audio controls src={URL.createObjectURL(rec.blob)} className="w-full mb-2" />
-//               <div className="flex justify-between">
-//                 <button
-//                   onClick={(e) => {
-//                     e.stopPropagation(); // Prevent selection when clicking download
-//                     downloadRecording(rec.blob, `recording-${index + 1}.mp3`);
-//                   }}
-//                   className="download-button bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-full transition-colors"
-//                 >
-//                   ⬇️ Download
-//                 </button>
-//                 <button
-//                   onClick={(e) => {
-//                     e.stopPropagation(); // Prevent selection when clicking delete
-//                     deleteRecording(rec.id);
-//                   }}
-//                   className="delete-button bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-full transition-colors"
-//                 >
-//                   ❌ Delete
-//                 </button>
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
+  // Filter recordings based on search query
+  const filteredRecordings = recordings.filter((rec) =>
+    (rec.filename || `Recording ${rec.id}`)
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase())
+  );
 
-// export default PlaybackList;
+  // Function to download recording with its name
+  const downloadRecording = (blob, filename) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
-//----------Works LIT
-// PlaybackList.js
-// import React from 'react';
-
-// const PlaybackList = ({ recordings, deleteRecording }) => {
-//   const downloadRecording = (blob, filename) => {
-//     const url = URL.createObjectURL(blob);
-//     const a = document.createElement('a');
-//     a.href = url;
-//     a.download = filename;
-//     document.body.appendChild(a);
-//     a.click();
-//     document.body.removeChild(a);
-//     URL.revokeObjectURL(url);
-//   };
-
-//   return (
-//     <div className="p-6 bg-white shadow-xl rounded-2xl mt-6">
-//       <h2 className="text-2xl font-extrabold text-indigo-600 mb-4">🎙️ Saved Recordings</h2>
-//       {recordings.length === 0 ? (
-//         <p className="text-gray-500 italic">No recordings yet. Start recording to see them here!</p>
-//       ) : (
-//         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-//           {recordings.map((rec, index) => (
-//             <div
-//               key={rec.id}
-//               className="bg-gradient-to-r from-indigo-500 to-purple-500 p-4 rounded-lg shadow-lg text-white hover:shadow-xl transition-shadow"
-//             >
-//               <h3 className="font-bold text-lg">🎧 Recording {index + 1}</h3>
-//               <audio controls src={URL.createObjectURL(rec.blob)} className="mt-2 w-full rounded-lg" />
-//               <div className="flex justify-between mt-4">
-//                 <button
-//                   onClick={() => downloadRecording(rec.blob, `recording-${index + 1}.mp3`)}
-//                   className="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-full text-white"
-//                 >
-//                   ⬇️ Download
-//                 </button>
-//                 <button
-//                   onClick={() => deleteRecording(rec.id)}
-//                   className="bg-red-600 hover:bg-red-700 px-3 py-1 rounded-full text-white"
-//                 >
-//                   ❌ Delete
-//                 </button>
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default PlaybackList;
-
-// Updated PlaybackList.js
-import React from 'react';
-
-const PlaybackList = ({ recordings, deleteRecording, handlePlayFromList }) => {
   return (
-    <div className="p-6 bg-white shadow-xl rounded-2xl mt-6">
-      <h2 className="text-2xl font-extrabold text-indigo-600 mb-4">🎙️ Saved Recordings</h2>
-      {recordings.length === 0 ? (
-        <p className="text-gray-500 italic">No recordings yet. Start recording to see them here!</p>
-      ) : (
-        <div className="space-y-4">
-          {recordings.map((rec, index) => (
-            <div
-              key={rec.id}
-              className="flex items-center space-x-4 p-4 bg-gradient-to-r from-purple-400 to-indigo-600 rounded-lg shadow-lg hover:scale-105 transition-transform"
-            >
-              <div className="text-white font-bold">Recording {index + 1}</div>
+    <div className="p-6 shadow-2xl rounded-2xl mt-6">
+      {/* Search Bar */}
+      <div className="flex justify-center items-center h-16 w-full">
+        <input 
+          type="text"
+          placeholder="Search Recording..."
+          className="search-bar px-4 py-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 w-1/2 mb-4"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+
+      {/* Title with GIF */}
+      <h2
+        className={`text-3xl font-extrabold bg-gradient-to-r ${
+          darkMode
+            ? "from-white via-green-300 to-teal-400"
+            : "from-gray-800 via-green-300 to-teal-400"
+        } text-transparent bg-clip-text drop-shadow-lg mb-6 flex items-start space-x-3 rounded-xl p-4`}
+      >
+        <img
+          src="/record.gif"
+          alt="Microphone GIF"
+          className="w-12 h-12 rounded-xl shadow-md"
+        />
+        <span className="tracking-wide">RECORDS</span>
+      </h2>
+
+      {filteredRecordings.length === 0 ? (
+        <p className="text-gray-300 italic text-center">
+            No matching recordings found.
+        </p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...filteredRecordings].reverse().map((rec) => (
+              <div
+                key={rec.id}
+                  className="flex flex-col items-center space-y-4 p-5 bg-gradient-to-r from-purple-500 via-pink-500 to-red-400 rounded-2xl shadow-xl hover:scale-105 transition-transform duration-300"
+              >
+                {/* Display filename */}
+                  <div className="text-white font-bold text-lg">
+                    {rec.filename || `Recording ${rec.id}`}
+                  </div>
+                  
+              {/* Buttons: Play, Download, Delete */}
               <div className="flex space-x-2">
                 <button
-                  onClick={() => handlePlayFromList(rec.blob)}
-                  className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-full transition-colors"
+                  onClick={() => handlePlayFromList(rec.blob, rec.id)}
+                  className={`${
+                    currentlyPlayingId === rec.id
+                      ? "bg-orange-500 hover:bg-orange-600"
+                      : "bg-green-500 hover:bg-green-600"
+                  } text-white px-4 py-2 rounded-full transition-colors`}
                 >
                   ▶ Play
                 </button>
+
+                <button
+                  onClick={() =>
+                    downloadRecording(
+                      rec.blob,
+                      rec.filename || `recording-${rec.id}.mp3`
+                    )
+                  }
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition-colors"
+                >
+                  Download
+                </button>
+
                 <button
                   onClick={() => deleteRecording(rec.id)}
-                  className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-full transition-colors"
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full transition-colors"
                 >
-                  ❌ Delete
+                  Delete
                 </button>
               </div>
             </div>
@@ -203,4 +234,8 @@ const PlaybackList = ({ recordings, deleteRecording, handlePlayFromList }) => {
 };
 
 export default PlaybackList;
+
+
+
+
 
