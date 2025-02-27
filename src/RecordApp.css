@@ -1,4 +1,5 @@
 /* RecordApp.css */
+
   /* .record-app {
     position: relative;
     color: white;
@@ -19,7 +20,13 @@
     /* color: white; */
     /* background: #aee790e4; */
     /* background: linear-gradient(45deg, #fbacae, #34bda2, #ca84f9, #88c35e); */
-    background: linear-gradient(135deg, #f0fbe0, #e6f7d0);
+    background: linear-gradient(45deg, 
+    rgba(251, 172, 174, 0.2), /* #fbacae with 20% opacity */
+    rgba(52, 189, 162, 0.2), /* #34bda2 with 20% opacity */
+    rgba(202, 132, 249, 0.2), /* #ca84f9 with 20% opacity */
+    rgba(136, 195, 94, 0.2)  /* #88c35e with 20% opacity */
+    );
+    /* background: linear-gradient(135deg, #f0fbe0, #e6f7d0); */
     font-family: sans-serif;
     display: flex;
     flex-direction: column;
@@ -31,7 +38,8 @@
   }
   /* Dark Mode */
   .record-app.dark-mode {
-    background: #1e1e1e;
+    /* background: #1e1e1e; */
+    background: rgba(30, 30, 30, 0.2);
     color: #f5f5f5;
   }
 
@@ -62,11 +70,16 @@
     padding: 10px;
     font-size: 16px;
   }
-
+  .profile-button2
+  {
+    background: none;
+    padding: none;
+  }
   button:hover {
     opacity: 0.8;
   }
-  /* .background-video {
+  
+  .background-video {
     position: fixed; 
     top: 0;
     left: 0;
@@ -75,7 +88,7 @@
     object-fit: cover; 
     z-index: -1; 
     pointer-events: none; 
-  } */
+  }
   
 
   /* .record-app {
@@ -345,15 +358,30 @@
     margin-top: 20px;
   }
   
-  .control-button {
+  /* .control-button {
     background: none;
     border: none;
-    /* color: white; */
     color: black;
     font-size: 24px;
     margin: 0 15px;
     cursor: pointer;
+  } */
+
+  .control-button {
+    background: red; /* Solid red circle */
+    color: white; /* Ensures visibility */
+    font-size: 24px;
+    margin: 0 15px;
+    cursor: pointer;
+    width: 50px; /* Ensures a circular shape */
+    height: 50px;
+    border-radius: 50%; /* Makes it a perfect circle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none; /* Removes any border */
   }
+  
   
   .play-button {
     font-size: 30px;
@@ -407,5 +435,80 @@
     color: white;
   }
 
+  /* .profile-dropdown {
+    position: absolute;
+    top: 60px; 
+    right: 10px; 
+    background-color: #fff; 
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 1000; 
+  }
+  */
+  .profile-dropdown-content {
+    padding: 10px;
+    min-width: 200px;
+  } 
 
+  .profile-dropdown {
+    position: absolute;
+    top: 60px; /* Adjust as needed */
+    right: 10px; /* Adjust as needed */
+    background-color: #ffffff; /* White background */
+    border: 1px solid #e0e0e0; /* Light border */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    z-index: 1000;
+    padding: 20px;
+    width: 280px; /* Adjust width as needed */
+    text-align: center;
+  }
+  
+  .profile-title {
+    font-size: 28px; /* Slightly smaller for dropdown */
+    margin-bottom: 10px;
+    color: #333333; /* Dark gray for good contrast */
+    text-shadow: none; /* Removed text shadow */
+  }
+  
+  .profile-details {
+    margin-bottom: 20px;
+  }
+  
+  .profile-details p {
+    margin: 5px 0;
+    color: #666666; /* Medium gray */
+    font-size: 14px; /* Smaller font size */
+  }
+  
+  .profile-button {
+    padding: 12px 25px; /* Slightly smaller padding */
+    border: none;
+    border-radius: 6px; /* Less rounded corners */
+    background: #007bff; /* Blue button for logout */
+    color: #ffffff; /* White text */
+    font-weight: 500; /* Lighter font weight */
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .profile-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+  }
+  
+  /* Dark mode adjustments */
+  .dark-mode .profile-dropdown {
+    background-color: #222222; /* Dark background */
+    border-color: #444444; /* Darker border */
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1); /* Light shadow on dark */
+  }
+  
+  .dark-mode .profile-title {
+    color: #ffffff; /* White text */
+  }
+  
+  .dark-mode .profile-details p {
+    color: #cccccc; /* Light gray text */
+  }
   
