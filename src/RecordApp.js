@@ -452,7 +452,7 @@ function RecordApp() {
               {/* <div className="profile-image-container">
                 <img src={userDetails.photo} alt="Profile" className="profile-image" />
               </div> */}
-              <h3 className="profile-title">Welcome, {userDetails.firstName}!</h3>
+              <h3 className="profile-title">Welcome, {userDetails.firstName}</h3>
               <div className="profile-details">
                 <p>Email: {userDetails.email}</p>
               </div>

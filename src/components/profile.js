@@ -41,10 +41,10 @@ function Profile() {
               className="profile-image"
             />
           </div>
-          <h3 className="profile-title">Welcome, {userDetails.firstName}!</h3>
+          <h3 className="profile-title">Welcome, {userDetails.firstName}</h3>
           <div className="profile-details">
             <p>Email: {userDetails.email}</p>
-            <p>First Name: {userDetails.firstName}</p>
+            {/* <p>First Name: {userDetails.firstName}</p> */}
           </div>
           <button className="profile-button" onClick={handleLogout}>
             Logout
